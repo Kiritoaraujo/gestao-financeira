@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gestão Financeira + Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="toast-box"></div>
+        <div class="wave-top"></div>
+        <button class="theme-toggle" onclick="alternarTema()" aria-label="Alternar tema"><i class="fas fa-moon" id="icon-theme"></i></button>
+
+        <main>
+            <div id="screen-login" class="screen active">
+            <div class="avatar-circle"><i class="fas fa-user" aria-hidden="true"></i></div>
+            <h2>Login</h2>
+            <form onsubmit="fazerLogin(event)">
+                <div class="input-group">
+                    <i class="fas fa-user-circle" aria-hidden="true"></i>
+                    <input type="text" id="log-user" placeholder="Usuário ou E-mail" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    <input type="password" id="log-pass" placeholder="Senha" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+            <div class="link-text" onclick="mudarTela('screen-recuperar')">Esqueceu a senha?</div>
+            <div class="link-text" onclick="mudarTela('screen-cadastro')" style="margin-top: 10px;">Criar nova conta</div>
+        </div>
+
+        <div id="screen-recuperar" class="screen">
+            <div class="avatar-circle"><i class="fas fa-key" aria-hidden="true"></i></div>
+            <h2>Recuperar Senha</h2>
+            <form onsubmit="recuperarSenha(event)">
+                <div class="input-group">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <input type="email" id="rec-email" placeholder="Seu E-mail Cadastrado" required>
+                </div>
+                <button type="submit" class="btn-primary">Buscar Senha</button>
+            </form>
+            <div class="link-text" onclick="mudarTela('screen-login')">Voltar para Login</div>
+        </div>
+
+        <div id="screen-cadastro" class="screen">
+            <div class="avatar-circle"><i class="fas fa-user-plus" aria-hidden="true"></i></div>
+            <h2>Nova Conta</h2>
+            <form onsubmit="fazerCadastro(event)">
+                <div class="input-group">
+                    <i class="fas fa-id-card" aria-hidden="true"></i>
+                    <input type="text" id="cad-nome" placeholder="Nome Completo" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <input type="email" id="cad-email" placeholder="E-mail" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-user-tag" aria-hidden="true"></i>
+                    <input type="text" id="cad-user" placeholder="Usuário (Login)" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    <input type="password" id="cad-pass" placeholder="Senha (Mín. 6 caracteres)" minlength="6" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-check-circle" aria-hidden="true"></i>
+                    <input type="password" id="cad-pass2" placeholder="Confirmar Senha" minlength="6" required>
+                </div>
+                <button type="submit" class="btn-primary">Cadastrar</button>
+            </form>
+            <div class="link-text" onclick="mudarTela('screen-login')">Voltar para Login</div>
+        </div>
+
+        <div id="screen-dashboard" class="screen" style="justify-content: flex-start; padding-top: 0;">
+            <div class="dashboard-header" style="margin-top: 20px;">
+                <h3 style="margin:0; font-size: 22px;"><span id="saudacao">Olá</span>, <span id="display-nome">Usuário</span></h3>
+                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">(As suas finanças em dia)</p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="scroll-arrow scroll-arrow-left" onclick="scrollMenuGrid(-1)"><i class="fas fa-chevron-left"></i></div>
+                <div class="menu-item" onclick="abrirLancamento()"><i class="fas fa-plus-circle"></i><span>Novo</span></div>
+                <div class="menu-item" onclick="mudarTela('screen-extrato')"><i class="fas fa-list-alt"></i><span>Extrato</span></div>
+                <div class="menu-item" onclick="mudarTela('screen-cofre'); renderizarCofre();"><i class="fas fa-piggy-bank"></i><span>Cofre</span></div>
+                <div class="menu-item" onclick="mudarTela('screen-clt')"><i class="fas fa-calculator"></i><span>Calc. CLT</span></div>
+                <div class="scroll-arrow scroll-arrow-right" onclick="scrollMenuGrid(1)"><i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="saldo-card">
+                <small><i class="fas fa-wallet" aria-hidden="true"></i> Saldo Atual</small>
+                <div class="saldo-valor" id="dash-saldo">R$ 0,00</div>
+                <small>Atualizado agora</small>
+            </div>
+
+            <div class="content-area">
+                <div class="section-title">Atividade Recente</div>
+                <div id="dash-lista"></div>
+            </div>
+            <button onclick="logout()" style="margin: 20px auto; background:transparent; border:none; color:var(--text-sec); text-decoration:underline; cursor:pointer;">Sair da Conta</button>
+        </div>
+
+        <div id="screen-lancamento" class="screen">
+            <div class="internal-header">
+                <button class="btn-back" onclick="mudarTela('screen-dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0;">Novo Lançamento</h3>
+            </div>
+            <div class="tipo-toggle">
+                <div class="t-btn desp active" id="btn-desp" onclick="setTipo('despesa')">Despesa</div>
+                <div class="t-btn rec" id="btn-rec" onclick="setTipo('receita')">Receita</div>
+            </div>
+            <form onsubmit="salvarLancamento(event)" class="form-card">
+                <input type="hidden" id="lanc-tipo" value="despesa">
+                <div class="input-group"><i class="fas fa-pen"></i><input type="text" id="lanc-desc" placeholder="Descrição (ex: Mercado)" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="lanc-val" placeholder="Valor (R$)" required></div>
+                <div class="input-group"><i class="fas fa-calendar-alt"></i><input type="date" id="lanc-data" required></div>
+                <button type="submit" class="btn-primary" style="margin-top:10px;">Salvar Lançamento</button>
+            </form>
+        </div>
+
+        <div id="screen-extrato" class="screen">
+            <div class="internal-header">
+                <button class="btn-back" onclick="mudarTela('screen-dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0;">Meu Extrato</h3>
+            </div>
+            
+            <div style="background: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px var(--shadow);">
+                <label style="font-size:12px; font-weight:bold; color:var(--text-sec); display:block; margin-bottom:8px;">Importar CSV de Banco</label>
+                <input type="file" accept=".csv" onchange="importarCSV(this)" style="font-size: 14px; width: 100%;">
+            </div>
+
+            <div class="content-area" style="flex-grow:1; overflow-y:auto; padding:0;">
+                <div id="extrato-lista"></div>
+            </div>
+        </div>
+
+        <div id="screen-cofre" class="screen">
+            <div class="internal-header">
+                <button class="btn-back" onclick="mudarTela('screen-dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0;">Meu Cofre</h3>
+            </div>
+            <button class="btn-primary" style="margin-bottom: 15px;" onclick="mudarTela('screen-nova-meta')"><i class="fas fa-plus"></i> Nova Meta</button>
+            <div id="cofre-lista" style="width: 100%; overflow-y: auto;"></div>
+        </div>
+
+        <div id="screen-nova-meta" class="screen">
+            <div class="internal-header">
+                <button class="btn-back" onclick="mudarTela('screen-cofre')"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0;">Criar Meta</h3>
+            </div>
+            <form onsubmit="salvarMeta(event)" class="form-card">
+                <div class="input-group"><i class="fas fa-bullseye"></i><input type="text" id="meta-nome" placeholder="O que deseja alcançar? (ex: Carro)" required></div>
+                <div class="input-group"><i class="fas fa-dollar-sign"></i><input type="number" step="0.01" id="meta-alvo" placeholder="Valor Alvo (R$)" required></div>
+                <button type="submit" class="btn-primary" style="margin-top:10px;">Salvar Meta</button>
+            </form>
+        </div>
+
+        <div id="screen-clt" class="screen">
+            <div class="internal-header">
+                <button class="btn-back" onclick="mudarTela('screen-dashboard')"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0;">Controle de Horas CLT</h3>
+            </div>
+            <form onsubmit="salvarDiaCLT(event)" class="form-card">
+                <div style="display:flex; gap:10px; width:100%; margin-bottom:15px;">
+                    <div style="flex:1;">
+                        <label style="font-size:12px; color:var(--text-sec);">Entrada</label>
+                        <input type="time" id="clt-ent" class="input-mini" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:12px; color:var(--text-sec);">Saída</label>
+                        <input type="time" id="clt-sai" class="input-mini" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <input type="number" id="clt-sal" placeholder="Salário Base Mensal (R$)" step="0.01">
+                </div>
+                <button type="submit" class="btn-primary">Computar Dia</button>
+            </form>
+            <div id="resultado-clt" style="display:none; margin-top:15px; background:var(--bg-card); padding:15px; border-radius:12px; text-align:center; box-shadow: 0 2px 5px var(--shadow);">
+                <p style="color:var(--text-sec); font-size:14px; margin-bottom:5px;">Horas Calculadas nesta sessão:</p>
+                <h2 style="color:var(--primary); margin:0;" id="clt-res-horas">0h</h2>
+                <div style="margin-top:10px; font-size:14px;">Ganhos estimados: <strong style="color:var(--success);" id="clt-res-valor">R$ 0,00</strong></div>
+            </div>
+        </div>
+
+        <div id="screen-admin" class="screen" style="justify-content: flex-start; padding-top: 0;">
+            <div class="dashboard-header" style="margin-top: 20px;">
+                <h3 style="margin:0; font-size: 22px;">Painel de Controle</h3>
+                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">Acesso Administrativo</p>
+            </div>
+            <div class="admin-tabs">
+                <div class="tab-btn active" id="btn-aba-user" onclick="alternarAbaAdm('usuarios')">Usuários</div>
+                <div class="tab-btn" id="btn-aba-fin" onclick="alternarAbaAdm('financeiro')">Financeiro Geral</div>
+            </div>
+            
+            <div id="aba-usuarios" class="tab-content active" style="margin-top: 15px;">
+                <div class="admin-card">
+                    <h4>Controle de Acessos</h4>
+                    <p style="font-size: 12px; color: var(--text-sec); margin-top: 2px;">Total de Contas: <strong id="adm-total-users">0</strong></p>
+                </div>
+                <div id="adm-user-list"></div>
+            </div>
+            
+            <div id="aba-financeiro" class="tab-content" style="display:none; margin-top: 15px;">
+                <div class="admin-card">
+                    <h4>Saúde Financeira Global</h4>
+                    <p style="font-size: 12px; color: var(--text-sec); margin-top: 2px;">Movimentado no Sistema: <strong id="adm-total-money" style="color: var(--success);">R$ 0</strong></p>
+                </div>
+                <div id="adm-status-list"></div>
+            </div>
+            <button onclick="logout()" style="margin: 20px auto; background:var(--danger); padding: 10px 20px; border-radius: 10px; border:none; color:white; font-weight: bold; cursor:pointer;">Sair do Painel Admin</button>
+        </div>
+        </main>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="script.js"></script>
+    <script>
+        function scrollMenuGrid(dir) {
+            const grid = document.querySelector('.menu-grid');
+            if (grid) grid.scrollBy({ left: dir * 100, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
